@@ -26,7 +26,7 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    position: relative; /* Wichtig für den Pointer */
+    position: relative; 
 }
 
 #upgrade-section {
@@ -48,33 +48,45 @@ body {
     );
     border: 10px solid #333;
     position: relative;
-    /* Angepasste Transition für realistischeres Abbremsen */
     transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); 
+    margin-top: 25px; 
 }
 
-/* Pointer (Marker) - Deutlicher und außerhalb des Rades */
+/* Neuer visueller Marker AUF dem Rad (Start des roten Segments) */
+#wheel::before {
+    content: '';
+    position: absolute;
+    /* Positioniert das Dreieck genau oben mittig (0 Grad) */
+    top: -15px; 
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Erzeugt ein kleines, rotes Dreieck */
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid #ff6347; /* Farbe des Gewinnsegments */
+    z-index: 10;
+}
+
+
+/* Pointer (FESTER Marker außerhalb des Rades) */
 #pointer {
     width: 0;
     height: 0;
-    border-left: 15px solid transparent; /* Breiter */
-    border-right: 15px solid transparent; /* Breiter */
+    border-left: 15px solid transparent; 
+    border-right: 15px solid transparent; 
     border-top: 30px solid #e91e63; /* Auffällige Farbe */
     position: absolute;
-    top: 15px; /* Position oberhalb des Rades */
+    top: 55px; /* Position oberhalb des Rades, im wheel-section container */
     left: 50%;
     transform: translateX(-50%);
-    z-index: 100; /* Stellt sicher, dass er über dem Rad ist */
+    z-index: 100; 
 }
 
-/* Position des Rades relativ zur Sektion für den Pointer */
 #wheel-section h2 {
     margin-top: 0;
-}
-#wheel-section #pointer {
-    top: 55px; /* Korrigierte Position relativ zur Sektion */
-}
-#wheel {
-    margin-top: 25px; /* Platz für den Pointer */
 }
 
 
@@ -188,4 +200,20 @@ body {
 .progress-fill {
     height: 100%;
     background-color: #4CAF50;
-    transition: width 0
+    transition: width 0.3s;
+}
+
+/* Joker Button */
+#joker-button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#joker-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
