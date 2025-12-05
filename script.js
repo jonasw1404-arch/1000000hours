@@ -1,76 +1,126 @@
-// Spielwerte
-let hours = 0;
-const goal = 1000000;
+let points = 0;
+let streak = 0;
 
-// Timer-Basis: 1 Sekunde = 1 Stunde
-let baseSpeed = 1;
+let baseChance = 0.25; // Grundchance für farbige Fläche
+let sizeBonus = 0;     // Upgrade +5%
+let talismanBonus = 0; // Upgrade +10%
+let jokerCount = 0;
+let doublePoints = false;
+let chainShield = 0;
 
-// Multiplikator durch Upgrades
-let multiplier = 1;
+const streakGoal = 5;
 
-// Upgrade-Definitionen
-const upgrades = [
-    { name: "Kaffee", cost: 10, multiplier: 1.5, level: 0 },
-    { name: "Energy Drink", cost: 100, multiplier: 2, level: 0 },
-    { name: "Schlafentzug", cost: 500, multiplier: 3, level: 0 },
-    { name: "KI-Assistent", cost: 5000, multiplier: 5, level: 0 },
-    { name: "Zeitmaschine", cost: 20000, multiplier: 10, level: 0 },
-];
+const pointsEl = document.getElementById("points");
+const streakEl = document.getElementById("streak");
+const jokerEl = document.getElementById("joker");
+const wheelEl = document.getElementById("wheel");
 
-// Timer-Elemente
-const timerEl = document.getElementById("timer");
-const progressEl = document.getElementById("progress");
-const upgradeList = document.getElementById("upgrade-list");
+function updateWheel() {
+  wheelEl.innerHTML = "";
+  const totalChance = Math.min(baseChance + sizeBonus + talismanBonus, 0.8);
+  const redAngle = totalChance * 360;
 
-// Upgrade Buttons erstellen
-function renderUpgrades() {
-    upgradeList.innerHTML = "";
-    upgrades.forEach((up, index) => {
-        const div = document.createElement("div");
-        div.className = "upgrade";
-        div.innerHTML = `
-            <span>${up.name} (Level: ${up.level}) - Kosten: ${up.cost}h</span>
-            <button id="buy-${index}">Kaufen</button>
-        `;
-        upgradeList.appendChild(div);
+  const red = document.createElement("div");
+  red.classList.add("segment", "red");
+  red.style.transform = `rotate(0deg) skewY(-60deg)`;
+  wheelEl.appendChild(red);
 
-        document.getElementById(`buy-${index}`).addEventListener("click", () => buyUpgrade(index));
-    });
+  const gray = document.createElement("div");
+  gray.classList.add("segment", "gray");
+  gray.style.transform = `rotate(${redAngle}deg) skewY(-60deg)`;
+  wheelEl.appendChild(gray);
 }
 
-// Upgrade kaufen
-function buyUpgrade(index) {
-    const up = upgrades[index];
-    if (hours >= up.cost) {
-        hours -= up.cost;
-        multiplier *= up.multiplier;
-        up.level += 1;
-        // Kosten exponentiell steigern
-        up.cost = Math.floor(up.cost * 1.2);
-        renderUpgrades();
-        updateTimer();
+updateWheel();
+
+function spinWheel() {
+  if (streak >= streakGoal) {
+    alert("Du hast die Kette bereits geschafft! Setze zurück für neue Runde.");
+    return;
+  }
+
+  let totalChance = Math.min(baseChance + sizeBonus + talismanBonus, 0.8);
+  let success = Math.random() < totalChance;
+
+  // Joker verwenden
+  if (!success && jokerCount > 0) {
+    success = true;
+    jokerCount--;
+    alert("Joker benutzt! Dreh erfolgreich.");
+  }
+
+  if (success) {
+    streak++;
+    points += doublePoints ? 2 : 1;
+    if (streak === streakGoal) {
+      points += 5; // Bonus
+      alert("Kette geschafft! Bonus +5 Punkte");
+      streak = 0;
     }
+  } else {
+    if (chainShield > 0) {
+      chainShield--;
+      alert("Ketten-Schutz aktiviert! Kette bleibt erhalten.");
+    } else {
+      streak = 0;
+    }
+  }
+
+  updateDisplay();
 }
 
-// Timer hochzählen
-function updateTimer() {
-    timerEl.textContent = `${Math.floor(hours)} Stunden`;
-    const progressPercent = Math.min((hours / goal) * 100, 100);
-    progressEl.style.width = progressPercent + "%";
-
-    // Upgrade-Buttons aktivieren/deaktivieren
-    upgrades.forEach((up, index) => {
-        const btn = document.getElementById(`buy-${index}`);
-        if (btn) btn.disabled = hours < up.cost;
-    });
+function updateDisplay() {
+  pointsEl.textContent = points;
+  streakEl.textContent = streak;
+  jokerEl.textContent = jokerCount;
 }
 
-// Spiel-Loop jede Sekunde
-setInterval(() => {
-    hours += baseSpeed * multiplier;
-    updateTimer();
-}, 1000);
+// Upgrade Buttons
+document.getElementById("upgradeSize").addEventListener("click", () => {
+  const cost = 3;
+  if (points >= cost && sizeBonus < 0.25) {
+    points -= cost;
+    sizeBonus += 0.05;
+    updateWheel();
+    updateDisplay();
+  }
+});
 
-// Upgrade initial rendern
-renderUpgrades();
-updateTimer();
+document.getElementById("buyJoker").addEventListener("click", () => {
+  const cost = 5;
+  if (points >= cost) {
+    points -= cost;
+    jokerCount++;
+    updateDisplay();
+  }
+});
+
+document.getElementById("upgradeBonus").addEventListener("click", () => {
+  const cost = 7;
+  if (points >= cost) {
+    points -= cost;
+    doublePoints = true;
+    updateDisplay();
+  }
+});
+
+document.getElementById("upgradeChain").addEventListener("click", () => {
+  const cost = 10;
+  if (points >= cost) {
+    points -= cost;
+    chainShield++;
+    updateDisplay();
+  }
+});
+
+document.getElementById("upgradeTalisman").addEventListener("click", () => {
+  const cost = 8;
+  if (points >= cost && talismanBonus < 0.3) {
+    points -= cost;
+    talismanBonus += 0.1;
+    updateWheel();
+    updateDisplay();
+  }
+});
+
+document.getElementById("spinBtn").addEventListener("click", spinWheel);
