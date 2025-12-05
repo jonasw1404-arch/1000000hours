@@ -2,41 +2,29 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Chronos Klicker: 1.000.000 Stunden</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Clicker 1M</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <header>
-        <h1>Das Ziel: 1.000.000 Stunden</h1>
+        <h1>Time Clicker 1M</h1>
     </header>
-
     <main>
-        <div id="timer-container">
-            <h2>Virtuelle Zeit verstrichen:</h2>
-            <div id="virtual-timer" class="big-number">0 h, 0 m, 0 s</div>
-            <p>Verbleibend: <span id="time-remaining">1.000.000 Stunden</span></p>
-        </div>
-
-        <hr>
-
-        <div id="click-section">
-            <button id="main-clicker">KLICKE FÜR ZEIT-EINHEITEN (TZ)</button>
-            <p>Deine TZ: <span id="tz-counter" class="big-number">0</span></p>
-            <p>TZ/Sekunde (Passiv): <span id="passive-rate">0</span></p>
-        </div>
-
-        <hr>
-
-        <div id="shop">
-            <h2>Upgrades / Vorteile</h2>
+        <div class="timer-container">
+            <div id="timer">0 Stunden</div>
+            <div class="progress-bar">
+                <div id="progress"></div>
             </div>
+        </div>
+        <div class="upgrades">
+            <h2>Upgrades</h2>
+            <div id="upgrade-list"></div>
+        </div>
     </main>
-
     <footer>
-        <p>&copy; 2024 Chronos Klicker - Lade bitte nicht neu.</p>
+        <p>Ziel: 1.000.000 Stunden!</p>
     </footer>
-
     <script src="script.js"></script>
 </body>
 </html>
