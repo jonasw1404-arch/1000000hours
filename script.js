@@ -1,126 +1,249 @@
-let points = 0;
-let streak = 0;
+// --- JAVASCRIPT LOGIC ---
 
-let baseChance = 0.25; // Grundchance für farbige Fläche
-let sizeBonus = 0;     // Upgrade +5%
-let talismanBonus = 0; // Upgrade +10%
-let jokerCount = 0;
-let doublePoints = false;
-let chainShield = 0;
+const CHAIN_GOAL = 5;
+const BASE_SUCCESS_CHANCE = 0.25; // 25%
 
-const streakGoal = 5;
+// Spielstatus-Objekt
+let game = {
+    points: 0,
+    chain: 0,
+    isSpinning: false,
+    // Joker und Ketten-Schutz Vorrat (gekauft)
+    jokerStock: 0,
+    chainGuardStock: 0, 
+    
+    // Ketten-Schutz-Nutzungen in aktueller Kette
+    chainGuardUses: 0,
 
-const pointsEl = document.getElementById("points");
-const streakEl = document.getElementById("streak");
-const jokerEl = document.getElementById("joker");
-const wheelEl = document.getElementById("wheel");
+    // Upgrades: Level und Kosten
+    upgrades: {
+        Area: { level: 0, maxLevel: 5, costs: [3, 6, 10, 15, 21] },
+        Joker: { level: 0, maxLevel: 3, costs: [5, 12, 20] },
+        Points: { level: 0, maxLevel: 3, costs: [7, 15, 25] },
+        ChainGuard: { level: 0, maxLevel: 2, costs: [10, 25] },
+        Talisman: { level: 0, maxLevel: 3, costs: [8, 18, 30] }
+    }
+};
 
-function updateWheel() {
-  wheelEl.innerHTML = "";
-  const totalChance = Math.min(baseChance + sizeBonus + talismanBonus, 0.8);
-  const redAngle = totalChance * 360;
+// DOM-Elemente
+const wheelEl = document.getElementById('wheel');
+const spinButton = document.getElementById('spin-button');
+const jokerButton = document.getElementById('joker-button');
+const pointsStatus = document.getElementById('points-status');
+const chainStatus = document.getElementById('chain-status');
+const messageEl = document.getElementById('message');
+const upgradeButtons = document.querySelectorAll('.upgrade-button');
+const baseChanceEl = document.getElementById('base-chance');
+const areaBonusEl = document.getElementById('area-bonus');
+const talismanBonusEl = document.getElementById('talisman-bonus');
+const totalChanceEl = document.getElementById('total-chance');
 
-  const red = document.createElement("div");
-  red.classList.add("segment", "red");
-  red.style.transform = `rotate(0deg) skewY(-60deg)`;
-  wheelEl.appendChild(red);
 
-  const gray = document.createElement("div");
-  gray.classList.add("segment", "gray");
-  gray.style.transform = `rotate(${redAngle}deg) skewY(-60deg)`;
-  wheelEl.appendChild(gray);
+// --- BERECHNUNGSFUNKTIONEN ---
+
+/** Berechnet die aktuelle Erfolgswahrscheinlichkeit in Dezimal (0.0 - 1.0) */
+function calculateTotalChance() {
+    let totalChance = BASE_SUCCESS_CHANCE;
+    
+    // 1. Flächen-Vergrößerung (+5% pro Level)
+    let areaBonus = game.upgrades.Area.level * 0.05;
+    
+    // 2. Glücks-Talisman (+10% pro Level)
+    let talismanBonus = game.upgrades.Talisman.level * 0.10;
+
+    totalChance += areaBonus + talismanBonus;
+
+    // Maximalwert auf 0.80 (80%) begrenzen
+    return Math.min(totalChance, 0.80);
 }
 
-updateWheel();
+/** Berechnet die aktuellen Punkte pro erfolgreichem Dreh */
+function calculatePointsPerSuccess() {
+    // Zusatzzahlung: Basis 1 Punkt. Level 1: 2x (2P), Level 2: 4x (4P), Level 3: 8x (8P)
+    return Math.pow(2, game.upgrades.Points.level);
+}
 
-function spinWheel() {
-  if (streak >= streakGoal) {
-    alert("Du hast die Kette bereits geschafft! Setze zurück für neue Runde.");
-    return;
-  }
+// --- UPDATE UI FUNKTIONEN ---
 
-  let totalChance = Math.min(baseChance + sizeBonus + talismanBonus, 0.8);
-  let success = Math.random() < totalChance;
+/** Aktualisiert alle Statusanzeigen und UI-Elemente */
+function updateUI() {
+    const totalChance = calculateTotalChance();
+    const totalChancePercent = Math.round(totalChance * 100);
+    const areaBonusPercent = game.upgrades.Area.level * 5;
+    const talismanBonusPercent = game.upgrades.Talisman.level * 10;
+    
+    // Statusfelder
+    pointsStatus.textContent = `Punkte: ${game.points}`;
+    chainStatus.textContent = `Erfolgskette: ${game.chain}/${CHAIN_GOAL}`;
+    
+    // Joker-Button
+    jokerButton.textContent = `Joker einsetzen (${game.jokerStock})`;
+    jokerButton.disabled = game.jokerStock <= 0 || game.isSpinning;
+    
+    // Chance-Anzeige
+    baseChanceEl.textContent = `${(BASE_SUCCESS_CHANCE * 100).toFixed(0)}%`;
+    areaBonusEl.textContent = `${areaBonusPercent}%`;
+    talismanBonusEl.textContent = `${talismanBonusPercent}%`;
+    totalChanceEl.textContent = `${totalChancePercent}%`;
+    
+    // Rad-Visualisierung
+    wheelEl.style.setProperty('--hit-percent', `${totalChancePercent}%`);
+    
+    // Upgrade-Sektion
+    updateUpgradeUI();
+}
 
-  // Joker verwenden
-  if (!success && jokerCount > 0) {
-    success = true;
-    jokerCount--;
-    alert("Joker benutzt! Dreh erfolgreich.");
-  }
+/** Aktualisiert die Upgrade-Anzeigen und Buttons */
+function updateUpgradeUI() {
+    upgradeButtons.forEach(button => {
+        const type = button.dataset.upgrade;
+        const upgrade = game.upgrades[type];
+        const nextCost = upgrade.costs[upgrade.level];
+        const maxLevel = upgrade.maxLevel;
 
-  if (success) {
-    streak++;
-    points += doublePoints ? 2 : 1;
-    if (streak === streakGoal) {
-      points += 5; // Bonus
-      alert("Kette geschafft! Bonus +5 Punkte");
-      streak = 0;
-    }
-  } else {
-    if (chainShield > 0) {
-      chainShield--;
-      alert("Ketten-Schutz aktiviert! Kette bleibt erhalten.");
+        const parent = document.getElementById(`upgrade-${type}`);
+        const levelTextEl = parent.querySelector('.level-text');
+        const progressFillEl = parent.querySelector('.progress-fill');
+        
+        // Progress Bar
+        progressFillEl.style.width = `${(upgrade.level / maxLevel) * 100}%`;
+
+        if (upgrade.level < maxLevel) {
+            levelTextEl.textContent = `Lvl ${upgrade.level}/${maxLevel} (Kosten: ${nextCost} P.)`;
+            button.disabled = game.points < nextCost;
+            button.textContent = 'Kaufen';
+        } else {
+            levelTextEl.textContent = `Lvl ${maxLevel}/${maxLevel} (Max Level)`;
+            button.disabled = true;
+            button.textContent = 'Max Level';
+        }
+    });
+}
+
+// --- GAME LOGIC FUNKTIONEN ---
+
+/** Führt eine Rad-Drehung durch */
+function spinWheel(useJoker = false) {
+    if (game.isSpinning) return;
+    game.isSpinning = true;
+    spinButton.disabled = true;
+    jokerButton.disabled = true;
+
+    messageEl.textContent = 'Das Rad dreht sich...';
+
+    const totalChance = calculateTotalChance();
+    const isSuccess = useJoker || Math.random() < totalChance;
+    
+    // Zufällige Rotationsmenge für visuelle Animation
+    const fullRotations = 5; // 5 volle Drehungen
+    
+    let finalAngle;
+    if (isSuccess) {
+        // Landet im Trefferbereich (0 bis totalChance * 360 Grad)
+        finalAngle = Math.random() * (totalChance * 360);
     } else {
-      streak = 0;
+        // Landet außerhalb des Trefferbereichs
+        // Startet nach dem Trefferbereich (totalChance * 360) und endet im Rest
+        finalAngle = Math.random() * (1 - totalChance) * 360 + (totalChance * 360);
     }
-  }
 
-  updateDisplay();
+    // Die finale CSS-Rotation (plus 90 Grad Versatz, damit der Zeiger richtig ausgerichtet ist)
+    const cssFinalAngle = (360 - finalAngle + 90) % 360;
+    
+    // Setze die End-Rotation (5 volle Drehungen + Endwinkel)
+    wheelEl.style.transform = `rotate(${360 * fullRotations + cssFinalAngle}deg)`;
+    
+    // Verarbeite Ergebnis nach Animationszeit (3 Sekunden)
+    setTimeout(() => {
+        processResult(isSuccess);
+    }, 3000); 
 }
 
-function updateDisplay() {
-  pointsEl.textContent = points;
-  streakEl.textContent = streak;
-  jokerEl.textContent = jokerCount;
+/** Verarbeitet das Ergebnis der Rad-Drehung */
+function processResult(isSuccess) {
+    game.isSpinning = false;
+    spinButton.disabled = false;
+    
+    // Setze das Rad zurück, um die nächste Drehung zu ermöglichen
+    wheelEl.style.transform = `rotate(0deg)`;
+
+    if (isSuccess) {
+        // Erfolg
+        const pointsGained = calculatePointsPerSuccess();
+        game.points += pointsGained;
+        game.chain++;
+        messageEl.textContent = `✅ Erfolg! +${pointsGained} Punkte.`;
+
+        if (game.chain >= CHAIN_GOAL) {
+            // Kette abgeschlossen!
+            game.points += 5; // Bonus
+            messageEl.textContent += ` 🏆 Kette abgeschlossen! Bonus +5 Punkte!`;
+            game.chain = 0; // Reset für neue Runde
+            game.chainGuardUses = 0; // Reset Schutz-Nutzungen
+        }
+
+    } else {
+        // Fehlschlag
+        
+        // Ketten-Schutz prüfen und nutzen (Max-Level ist Max-Uses pro Runde)
+        const maxGuardUses = game.upgrades.ChainGuard.level;
+        const hasChainGuard = maxGuardUses > 0 && game.chainGuardUses < maxGuardUses;
+        
+        if (hasChainGuard) {
+            // Schutz greift
+            game.chainGuardUses++;
+            messageEl.textContent = `❌ Fehlschlag, ABER... Ketten-Schutz (${game.chainGuardUses}/${maxGuardUses}) aktiv! Kette bleibt bei ${game.chain}/5.`;
+        } else {
+            // Kette bricht
+            messageEl.textContent = `❌ Fehlschlag! Kette bricht und wird auf 0/5 zurückgesetzt.`;
+            game.chain = 0;
+            game.chainGuardUses = 0; // Reset Schutz
+        }
+    }
+    
+    updateUI();
 }
 
-// Upgrade Buttons
-document.getElementById("upgradeSize").addEventListener("click", () => {
-  const cost = 3;
-  if (points >= cost && sizeBonus < 0.25) {
-    points -= cost;
-    sizeBonus += 0.05;
-    updateWheel();
-    updateDisplay();
-  }
+/** Kauft ein Upgrade */
+function buyUpgrade(type) {
+    const upgrade = game.upgrades[type];
+    if (upgrade.level >= upgrade.maxLevel) return; // Max Level erreicht
+
+    const cost = upgrade.costs[upgrade.level];
+    if (game.points < cost) return; // Nicht genug Punkte
+
+    game.points -= cost;
+    upgrade.level++;
+
+    // Spezial-Logik für Joker: Erhöht den Vorrat bei Kauf
+    if (type === 'Joker') {
+        game.jokerStock = game.upgrades.Joker.level; 
+    }
+    
+    messageEl.textContent = `Upgrade '${type}' auf Level ${upgrade.level} gekauft!`;
+    updateUI();
+}
+
+
+// --- EVENT LISTENER ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Stellt sicher, dass die UI beim Laden des Spiels aktualisiert wird
+    updateUI(); 
 });
 
-document.getElementById("buyJoker").addEventListener("click", () => {
-  const cost = 5;
-  if (points >= cost) {
-    points -= cost;
-    jokerCount++;
-    updateDisplay();
-  }
+spinButton.addEventListener('click', () => spinWheel(false));
+
+jokerButton.addEventListener('click', () => {
+    if (game.jokerStock > 0 && !game.isSpinning) {
+        game.jokerStock--;
+        spinWheel(true); // Joker erzwingt Erfolg
+        messageEl.textContent = `🃏 Joker eingesetzt! Nächste Drehung ist ein Erfolg!`;
+    }
 });
 
-document.getElementById("upgradeBonus").addEventListener("click", () => {
-  const cost = 7;
-  if (points >= cost) {
-    points -= cost;
-    doublePoints = true;
-    updateDisplay();
-  }
+upgradeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        buyUpgrade(button.dataset.upgrade);
+    });
 });
-
-document.getElementById("upgradeChain").addEventListener("click", () => {
-  const cost = 10;
-  if (points >= cost) {
-    points -= cost;
-    chainShield++;
-    updateDisplay();
-  }
-});
-
-document.getElementById("upgradeTalisman").addEventListener("click", () => {
-  const cost = 8;
-  if (points >= cost && talismanBonus < 0.3) {
-    points -= cost;
-    talismanBonus += 0.1;
-    updateWheel();
-    updateDisplay();
-  }
-});
-
-document.getElementById("spinBtn").addEventListener("click", spinWheel);
