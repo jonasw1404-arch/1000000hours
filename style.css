@@ -1,86 +1,71 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #1e1e2f;
-    color: #f0f0f0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+body { 
+  font-family: Arial, sans-serif; 
+  text-align: center; 
+  background: #f0f0f0; 
+  margin: 0; 
+  padding: 20px; 
+}
+h1 { color: #333; }
+
+#wheel { 
+  margin: 20px auto; 
+  width: 300px; 
+  height: 300px; 
+  border: 10px solid #333; 
+  border-radius: 50%; 
+  position: relative; 
+  overflow: hidden; 
 }
 
-header {
-    text-align: center;
-    padding: 20px;
-    background: #2c2c3e;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+.segment { 
+  width: 50%; 
+  height: 50%; 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform-origin: 0 0; 
 }
 
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+.red { 
+  background-color: red; 
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); 
 }
 
-.timer-container {
-    text-align: center;
-    margin-bottom: 30px;
+.gray { 
+  background-color: gray; 
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); 
 }
 
-#timer {
-    font-size: 3em;
-    margin-bottom: 10px;
+#spinBtn { 
+  padding: 10px 20px; 
+  font-size: 18px; 
+  margin-top: 20px; 
+  cursor: pointer; 
 }
 
-.progress-bar {
-    width: 80%;
-    background: #44445a;
-    border-radius: 10px;
-    overflow: hidden;
-    height: 20px;
-    margin: 0 auto;
+#info { 
+  margin-top: 20px; 
+  font-size: 18px; 
 }
 
-#progress {
-    height: 100%;
-    background: #00ff99;
-    width: 0%;
-    transition: width 0.2s;
+#upgrades { 
+  margin-top: 30px; 
+  display: flex; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+  gap: 10px; 
 }
 
-.upgrades {
-    width: 80%;
-    max-width: 600px;
+.upgrade { 
+  padding: 10px; 
+  background: #fff; 
+  border: 1px solid #333; 
+  border-radius: 8px; 
+  cursor: pointer; 
+  width: 180px; 
 }
 
-.upgrade {
-    background: #2c2c3e;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.upgrade button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    background: #00ff99;
-    color: #000;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.upgrade button:disabled {
-    background: #555;
-    cursor: not-allowed;
-}
-
-footer {
-    text-align: center;
-    padding: 10px;
-    background: #2c2c3e;
+.upgrade:disabled { 
+  background: #ccc; 
+  cursor: not-allowed; 
 }
