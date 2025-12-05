@@ -1,42 +1,86 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Chronos Klicker: 1.000.000 Stunden</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+    font-family: Arial, sans-serif;
+    background: #1e1e2f;
+    color: #f0f0f0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-    <header>
-        <h1>Das Ziel: 1.000.000 Stunden</h1>
-    </header>
+header {
+    text-align: center;
+    padding: 20px;
+    background: #2c2c3e;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
 
-    <main>
-        <div id="timer-container">
-            <h2>Virtuelle Zeit verstrichen:</h2>
-            <div id="virtual-timer" class="big-number">0 h, 0 m, 0 s</div>
-            <p>Verbleibend: <span id="time-remaining">1.000.000 Stunden</span></p>
-        </div>
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
 
-        <hr>
+.timer-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
 
-        <div id="click-section">
-            <button id="main-clicker">KLICKE FÜR ZEIT-EINHEITEN (TZ)</button>
-            <p>Deine TZ: <span id="tz-counter" class="big-number">0</span></p>
-            <p>TZ/Sekunde (Passiv): <span id="passive-rate">0</span></p>
-        </div>
+#timer {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
 
-        <hr>
+.progress-bar {
+    width: 80%;
+    background: #44445a;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+    margin: 0 auto;
+}
 
-        <div id="shop">
-            <h2>Upgrades / Vorteile</h2>
-            </div>
-    </main>
+#progress {
+    height: 100%;
+    background: #00ff99;
+    width: 0%;
+    transition: width 0.2s;
+}
 
-    <footer>
-        <p>&copy; 2024 Chronos Klicker - Lade bitte nicht neu.</p>
-    </footer>
+.upgrades {
+    width: 80%;
+    max-width: 600px;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+.upgrade {
+    background: #2c2c3e;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upgrade button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background: #00ff99;
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.upgrade button:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #2c2c3e;
+}
