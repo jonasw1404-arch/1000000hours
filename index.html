@@ -1,29 +1,104 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glücksrad-Spiel</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glücksrad-Upgrade-Spiel</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Glücksrad-Spiel</h1>
-<div id="wheel"></div>
-<button id="spinBtn">Drehen</button>
+    <h1>🎡 Glücksrad-Upgrade-Spiel</h1>
 
-<div id="info">
-  Punkte: <span id="points">0</span> | Kette: <span id="streak">0</span>/5 | Joker: <span id="joker">0</span>
-</div>
+    <div id="points-status" class="status-box">Punkte: 0</div>
+    <div id="chain-status" class="status-box">Erfolgskette: 0/5</div>
+    <div id="message">Bereit zum Drehen!</div>
 
-<div id="upgrades">
-  <button class="upgrade" id="upgradeSize">Fläche +5% (Kosten: 3)</button>
-  <button class="upgrade" id="buyJoker">Joker +1 (Kosten: 5)</button>
-  <button class="upgrade" id="upgradeBonus">Punkte x2 (Kosten: 7)</button>
-  <button class="upgrade" id="upgradeChain">Ketten-Schutz +1 (Kosten: 10)</button>
-  <button class="upgrade" id="upgradeTalisman">Glücks-Talisman +10% (Kosten: 8)</button>
-</div>
+    <div id="game-container">
+        
+        <div id="wheel-section">
+            <h2>Glücksrad</h2>
+            <div id="pointer"></div>
+            <div id="wheel" style="--hit-percent: 25%;"></div>
+            <button id="spin-button">Rad drehen</button>
 
-<script src="script.js"></script>
+            <button id="joker-button" disabled>Joker einsetzen (0)</button>
+
+            <h3>Aktuelle Chancen</h3>
+            <p>Grundchance: <span id="base-chance">25%</span></p>
+            <p>Flächen-Upgrade: <span id="area-bonus">0%</span></p>
+            <p>Talisman-Bonus: <span id="talisman-bonus">0%</span></p>
+            <p>Gesamt-Chance: <span id="total-chance">25%</span></p>
+        </div>
+
+        <div id="upgrade-section">
+            <h2>Upgrades Kaufen</h2>
+            <p>Investiere deine Punkte, um die Gewinnchancen und Boni zu verbessern.</p>
+
+            <div id="upgrade-list">
+                <div id="upgrade-Area" class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h4>Flächen-Vergrößerung</h4>
+                        <p>Erhöht den Anteil der farbigen Fläche um +5% pro Level.</p>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    </div>
+                    <div class="upgrade-controls">
+                        <span class="level-text">Lvl 0/5 (Kosten: 3 P.)</span>
+                        <button class="upgrade-button" data-upgrade="Area">Kaufen</button>
+                    </div>
+                </div>
+
+                <div id="upgrade-Joker" class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h4>Joker</h4>
+                        <p>Gewährt 1 automatische Erfolgsdrehung. Max. 3 Joker im Vorrat.</p>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    </div>
+                    <div class="upgrade-controls">
+                        <span class="level-text">Lvl 0/3 (Kosten: 5 P.)</span>
+                        <button class="upgrade-button" data-upgrade="Joker">Kaufen</button>
+                    </div>
+                </div>
+
+                <div id="upgrade-Points" class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h4>Zusatzzahlung</h4>
+                        <p>Verdoppelt Punkte pro erfolgreichem Dreh. (Basis: 1, Lvl 3: 8)</p>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    </div>
+                    <div class="upgrade-controls">
+                        <span class="level-text">Lvl 0/3 (Kosten: 7 P.)</span>
+                        <button class="upgrade-button" data-upgrade="Points">Kaufen</button>
+                    </div>
+                </div>
+
+                <div id="upgrade-ChainGuard" class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h4>Ketten-Schutz</h4>
+                        <p>1 Fehlversuch wird nicht zurückgesetzt. Max. 2 Nutzungen pro Runde.</p>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    </div>
+                    <div class="upgrade-controls">
+                        <span class="level-text">Lvl 0/2 (Kosten: 10 P.)</span>
+                        <button class="upgrade-button" data-upgrade="ChainGuard">Kaufen</button>
+                    </div>
+                </div>
+
+                <div id="upgrade-Talisman" class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h4>Glücks-Talisman</h4>
+                        <p>Erhöht die Grundchance um +10% (stackt mit Flächen-Vergrößerung).</p>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    </div>
+                    <div class="upgrade-controls">
+                        <span class="level-text">Lvl 0/3 (Kosten: 8 P.)</span>
+                        <button class="upgrade-button" data-upgrade="Talisman">Kaufen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script> 
 </body>
 </html>
