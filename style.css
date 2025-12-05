@@ -1,71 +1,192 @@
-body { 
-  font-family: Arial, sans-serif; 
-  text-align: center; 
-  background: #f0f0f0; 
-  margin: 0; 
-  padding: 20px; 
-}
-h1 { color: #333; }
-
-#wheel { 
-  margin: 20px auto; 
-  width: 300px; 
-  height: 300px; 
-  border: 10px solid #333; 
-  border-radius: 50%; 
-  position: relative; 
-  overflow: hidden; 
+/* --- CSS STYLES --- */
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 20px;
 }
 
-.segment { 
-  width: 50%; 
-  height: 50%; 
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
-  transform-origin: 0 0; 
+#game-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    gap: 20px;
+    margin-top: 20px;
 }
 
-.red { 
-  background-color: red; 
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); 
+#wheel-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.gray { 
-  background-color: gray; 
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); 
+#upgrade-section {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#spinBtn { 
-  padding: 10px 20px; 
-  font-size: 18px; 
-  margin-top: 20px; 
-  cursor: pointer; 
+/* Wheel Styles */
+#wheel {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #ff6347 0% var(--hit-percent),   /* farbige Fläche (Rot) */
+        #ccc var(--hit-percent) 100%    /* neutrale Felder (Grau) */
+    );
+    border: 10px solid #333;
+    position: relative;
+    transition: transform 3s cubic-bezier(0.2, 0.8, 0.4, 1.2); /* Sanfteres, animiertes Drehen */
 }
 
-#info { 
-  margin-top: 20px; 
-  font-size: 18px; 
+#pointer {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 20px solid #333;
+    position: absolute;
+    top: 30px; /* Position oberhalb des Rades */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
 }
 
-#upgrades { 
-  margin-top: 30px; 
-  display: flex; 
-  justify-content: center; 
-  flex-wrap: wrap; 
-  gap: 10px; 
+#spin-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.2s;
 }
 
-.upgrade { 
-  padding: 10px; 
-  background: #fff; 
-  border: 1px solid #333; 
-  border-radius: 8px; 
-  cursor: pointer; 
-  width: 180px; 
+#spin-button:hover:not(:disabled) {
+    background-color: #45a049;
 }
 
-.upgrade:disabled { 
-  background: #ccc; 
-  cursor: not-allowed; 
+#spin-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Info & Status */
+.status-box {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 250px;
+}
+
+#message {
+    min-height: 25px;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+#chain-status {
+    background-color: #ffeb3b;
+}
+
+#points-status {
+    background-color: #2196F3;
+    color: white;
+    font-size: 1.5em;
+}
+
+/* Upgrades */
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ddd;
+}
+
+.upgrade-info h4 {
+    margin: 0 0 5px 0;
+    color: #4CAF50;
+}
+
+.upgrade-info p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.upgrade-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upgrade-button {
+    padding: 8px 15px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.upgrade-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.upgrade-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.level-text {
+    font-weight: bold;
+    color: #333;
+    min-width: 60px;
+    text-align: right;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s;
+}
+
+/* Joker Button */
+#joker-button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#joker-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
 }
