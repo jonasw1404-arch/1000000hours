@@ -26,6 +26,7 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* Wichtig für den Pointer */
 }
 
 #upgrade-section {
@@ -47,21 +48,35 @@ body {
     );
     border: 10px solid #333;
     position: relative;
-    transition: transform 3s cubic-bezier(0.2, 0.8, 0.4, 1.2); /* Sanfteres, animiertes Drehen */
+    /* Angepasste Transition für realistischeres Abbremsen */
+    transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); 
 }
 
+/* Pointer (Marker) - Deutlicher und außerhalb des Rades */
 #pointer {
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 20px solid #333;
+    border-left: 15px solid transparent; /* Breiter */
+    border-right: 15px solid transparent; /* Breiter */
+    border-top: 30px solid #e91e63; /* Auffällige Farbe */
     position: absolute;
-    top: 30px; /* Position oberhalb des Rades */
+    top: 15px; /* Position oberhalb des Rades */
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
+    z-index: 100; /* Stellt sicher, dass er über dem Rad ist */
 }
+
+/* Position des Rades relativ zur Sektion für den Pointer */
+#wheel-section h2 {
+    margin-top: 0;
+}
+#wheel-section #pointer {
+    top: 55px; /* Korrigierte Position relativ zur Sektion */
+}
+#wheel {
+    margin-top: 25px; /* Platz für den Pointer */
+}
+
 
 #spin-button {
     margin-top: 20px;
@@ -173,20 +188,4 @@ body {
 .progress-fill {
     height: 100%;
     background-color: #4CAF50;
-    transition: width 0.3s;
-}
-
-/* Joker Button */
-#joker-button {
-    margin-top: 10px;
-    padding: 8px 15px;
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-#joker-button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-}
+    transition: width 0
